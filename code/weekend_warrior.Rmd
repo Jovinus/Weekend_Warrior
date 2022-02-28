@@ -1,0 +1,55 @@
+---
+title: "Statistics for Weekend Warrior"
+output:
+  html_notebook: default
+  pdf_document: default
+  word_document: default
+
+fig_width: 6 
+fig_height: 4 
+---
+
+<style type="text/css">
+.main-container {
+  max-width: 1500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+
+```{r}
+library(data.table)
+library(moonBook)
+library(tidyverse)
+library(magrittr)
+```
+
+```{r}
+df_orig <- fread("../data/study_set_all.csv", na.strings = c('NA', '.'))
+df_orig
+```
+
+```{r}
+df_orig %<>% mutate_at(vars(sex, death, Hyperlipidemia, Hepatatis, ALC, Smoke, Diabetes, Hypertension, MED_HYPERTENSION, MED_HYPERLIPIDEMIA, cac_cut_0, cac_cut_100, cimt_75, bapwv_75), factor)
+
+df_orig$PAP <- factor(df_orig$PAP, levels = c("inactive", "insufficiently_active", "weekend_warrior", "regularly_active"))
+
+df_orig %<>% mutate_at(vars(-c(ID, PAP, SM_DATE, CDW_NO, HPCID, sex, death, Hyperlipidemia, Hepatatis, ALC, Smoke, Diabetes, Hypertension, MED_HYPERTENSION, MED_HYPERLIPIDEMIA, cac_cut_0, cac_cut_100, cimt_75, bapwv_75)), as.numeric)
+df_orig
+```
+## Descriptive Statistics
+
+### 1) Parasite Infection
+
+```{r}
+demo_table <- mytable(PAP ~ AGE + sex + BMI + rest_HR + Smoke + CRP + CHOLESTEROL + TG + `Glucose, Fasting` 
+                      + VO2max + death + Diabetes + Hypertension + Hyperlipidemia + Hepatatis + ALC 
+                      + HDL_C + LDL_C + SBP + DBP + MED_HYPERTENSION + MED_HYPERLIPIDEMIA 
+                      + baPWV + mean_IMT + CAC + cac_cut_0 + cac_cut_100 + cimt_75 + bapwv_75, 
+                      data=df_orig, digits=2, method=3, show.total=TRUE)
+mycsv(demo_table, file="../table_all.csv")
+demo_table
+```
+
+
